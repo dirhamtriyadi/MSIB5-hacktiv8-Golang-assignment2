@@ -17,3 +17,9 @@ type GetItemResponse struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
+
+type UpdateOrderRequest struct {
+	OrderedAt    time.Time        `json:"orderedAt"`
+	CustomerName string           `json:"customerName"`
+	Items        []NewItemRequest `json:"items"`
+}

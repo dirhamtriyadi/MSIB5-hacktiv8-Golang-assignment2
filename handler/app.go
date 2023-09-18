@@ -25,6 +25,10 @@ func StartApp() {
 
 	r.GET("/orders", orderHandler.GetOrders)
 
+	r.PATCH("/orders/:orderId", orderHandler.UpdateOrder)
+
+	r.DELETE("/orders/:orderId", orderHandler.DeleteOrder)
+
 	r.Run(":8080")
 
 }

@@ -55,3 +55,46 @@ func (oh *orderHandler) GetOrders(ctx *gin.Context) {
 
 	ctx.JSON(response.StatusCode, response)
 }
+
+func (oh *orderHandler) UpdateOrder(ctx *gin.Context) {
+	orderId := ctx.Param("orderId")
+
+	var updateOrderRequest dto.UpdateOrderRequest
+
+	if err := ctx.ShouldBindJSON(&updateOrderRequest); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusUnprocessableEntity, gin.H{
+			"message": "invalid json request",
+		})
+		return
+	}
+
+	err := oh.OrderService.UpdateOrder(orderId, updateOrderRequest)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "successfully updating an order",
+	})
+}
+
+func (oh *orderHandler) DeleteOrder(ctx *gin.Context) {
+	orderId := ctx.Param("orderId")
+
+	err := oh.OrderService.DeleteOrder(orderId)
+
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "successfully deleting an order",
+	})
+}

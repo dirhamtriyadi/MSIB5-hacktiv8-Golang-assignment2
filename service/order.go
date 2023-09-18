@@ -14,6 +14,8 @@ type orderService struct {
 type OrderService interface {
 	CreateOrder(newOrderRequest dto.NewOrderRequest) error
 	GetOrders() (*dto.GetOrdersResponse, error)
+	UpdateOrder(orderId string, updateOrderRequest dto.UpdateOrderRequest) error
+	DeleteOrder(orderId string) error
 }
 
 func NewOrderService(orderRepo order_repository.Repository) OrderService {
@@ -96,4 +98,42 @@ func (os *orderService) CreateOrder(newOrderRequest dto.NewOrderRequest) error {
 
 	return nil
 
+}
+
+func (os *orderService) UpdateOrder(orderId string, updateOrderRequest dto.UpdateOrderRequest) error {
+	orderPayload := entity.Order{
+		OrderedAt:    updateOrderRequest.OrderedAt,
+		CustomerName: updateOrderRequest.CustomerName,
+	}
+
+	itemPayload := []entity.Item{}
+
+	for _, eachItem := range updateOrderRequest.Items {
+		item := entity.Item{
+			ItemCode:    eachItem.ItemCode,
+			Description: eachItem.Description,
+			Quantity:    eachItem.Quantity,
+		}
+
+		itemPayload = append(itemPayload, item)
+
+	}
+
+	err := os.OrderRepo.UpdateOrder(orderId, orderPayload, itemPayload)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (os *orderService) DeleteOrder(orderId string) error {
+	err := os.OrderRepo.DeleteOrder(orderId)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

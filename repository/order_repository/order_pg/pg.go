@@ -32,6 +32,17 @@ const (
 		LEFT JOIN "items" as "i" ON "o"."order_id" = "i"."order_id"
 		ORDER BY "o"."order_id" ASC
 	`
+
+	updateOrderQuery = `
+		UPDATE "orders"
+		SET "ordered_at" = $1, "customer_name" = $2
+		WHERE "order_id" = $3
+	`
+
+	deleteOrderQuery = `
+		DELETE FROM "orders"
+		WHERE "order_id" = $1
+	`
 )
 
 func NewOrderPG(db *sql.DB) order_repository.Repository {
@@ -101,6 +112,26 @@ func (orderPG *orderPG) CreateOrder(orderPayload entity.Order, itemPayload []ent
 
 	if err != nil {
 		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
+func (orderPG *orderPG) UpdateOrder(orderId string, orderPayload entity.Order, itemPayload []entity.Item) error {
+	_, err := orderPG.db.Exec(updateOrderQuery, orderPayload.OrderedAt, orderPayload.CustomerName, orderId)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (orderPG *orderPG) DeleteOrder(orderId string) error {
+	_, err := orderPG.db.Exec(deleteOrderQuery, orderId)
+
+	if err != nil {
 		return err
 	}
 
