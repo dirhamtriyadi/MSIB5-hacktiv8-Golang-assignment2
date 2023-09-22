@@ -54,6 +54,11 @@ const (
 		"quantity" = $3
 		WHERE "item_code" = $1
 	`
+
+	deleteOrderByIdQuery = `
+		DELETE FROM "orders"
+		WHERE "order_id" = $1
+	`
 )
 
 func NewOrderPG(db *sql.DB) order_repository.Repository {
@@ -168,6 +173,30 @@ func (orderPG *orderPG) CreateOrder(orderPayload entity.Order, itemPayload []ent
 			tx.Rollback()
 			return errs.NewInternalServerError("something went wrong")
 		}
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	return nil
+}
+
+func (orderPG *orderPG) DeleteOrderById(orderId int) errs.Error {
+	tx, err := orderPG.db.Begin()
+
+	if err != nil {
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	_, err = tx.Exec(deleteOrderByIdQuery, orderId)
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong")
 	}
 
 	err = tx.Commit()

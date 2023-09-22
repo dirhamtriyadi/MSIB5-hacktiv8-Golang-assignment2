@@ -10,4 +10,5 @@ type Repository interface {
 	CreateOrder(orderPayload entity.Order, itemPayload []entity.Item) errs.Error
 	ReadOrders() ([]OrderItemMapped, errs.Error)
 	UpdateOrder(orderPayload entity.Order, itemPayload []entity.Item) errs.Error
+	DeleteOrderById(orderId int) errs.Error
 }
